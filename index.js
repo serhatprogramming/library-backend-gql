@@ -188,7 +188,7 @@ const resolvers = {
       return book.save();
     },
     addAuthor: async (root, args) => {
-      const author = new Author({ ...args });
+      const author = new Author({ ...args, bookCount: 0 });
       return author.save();
     },
     editAuthor: (root, args) => {
