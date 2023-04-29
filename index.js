@@ -179,9 +179,11 @@ const resolvers = {
       let author = null;
       const foundAuthor = await Author.findOne({ name: args.name });
       if (!foundAuthor) {
-        author = new Author({ name: args.name });
+        author = new Author({ name: args.name, bookCount: 1 });
         await author.save();
       } else {
+        foundAuthor.bookCount = foundAuthor.bookCount + 1;
+        await foundAuthor.save();
         author = foundAuthor;
       }
       const book = new Book({ ...args, author });
