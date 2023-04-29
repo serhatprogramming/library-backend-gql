@@ -117,7 +117,7 @@ const typeDefs = `
   type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author!
     id: ID!
     genres: [String!]!,
   }
@@ -140,20 +140,24 @@ const typeDefs = `
     addBook(
       title: String!
       published: Int!
-      author: String!
+      name: String!
       genres: [String!]!
       ):Book
     editAuthor(
       name:String!
       setBornTo: Int!
     ):Author
+    addAuthor(
+      name:String!
+      born:Int
+    ):Author
   }
 `;
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
+    bookCount: () => Book.collection.countDocuments(),
+    authorCount: () => Author.collection.countDocuments(),
     allBooks: (root, args) => {
       let result = books;
       result = args.author
@@ -171,13 +175,21 @@ const resolvers = {
       })),
   },
   Mutation: {
-    addBook: (root, args) => {
-      const book = { ...args, id: uuidv4() };
-      books = books.concat(book);
-      if (!authors.find((author) => author.name === book.author)) {
-        authors = authors.concat({ name: book.author, id: uuidv4() });
+    addBook: async (root, args) => {
+      let author = null;
+      const foundAuthor = await Author.findOne({ name: args.name });
+      if (!foundAuthor) {
+        author = new Author({ name: args.name });
+        await author.save();
+      } else {
+        author = foundAuthor;
       }
-      return book;
+      const book = new Book({ ...args, author });
+      return book.save();
+    },
+    addAuthor: async (root, args) => {
+      const author = new Author({ ...args });
+      return author.save();
     },
     editAuthor: (root, args) => {
       if (!authors.find((author) => author.name === args.name)) {
