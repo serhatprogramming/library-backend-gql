@@ -126,7 +126,7 @@ const typeDefs = `
     name: String!
     id: ID!
     born: Int
-    bookCount: Int!
+    bookCount: Int
   }
 
   type Query {
@@ -158,15 +158,15 @@ const resolvers = {
   Query: {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
-    allBooks: (root, args) => {
-      let result = books;
-      result = args.author
-        ? result.filter((book) => book.author === args.author)
-        : result;
-      result = args.genre
-        ? result.filter((book) => book.genres.includes(args.genre))
-        : result;
-      return result;
+    allBooks: async (root, args) => {
+      let books = await Book.find({}).populate("author");
+      books = args.author
+        ? books.filter((book) => book.author.name === args.author)
+        : books;
+      books = args.genre
+        ? books.filter((book) => book.genres.includes(args.genre))
+        : books;
+      return books;
     },
     allAuthors: () =>
       authors.map((author) => ({
