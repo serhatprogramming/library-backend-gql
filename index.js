@@ -168,11 +168,7 @@ const resolvers = {
         : books;
       return books;
     },
-    allAuthors: () =>
-      authors.map((author) => ({
-        ...author,
-        bookCount: books.filter((book) => book.author === author.name).length,
-      })),
+    allAuthors: async () => Author.find({}),
   },
   Mutation: {
     addBook: async (root, args) => {
