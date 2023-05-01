@@ -174,20 +174,40 @@ const resolvers = {
     addBook: async (root, args) => {
       let author = null;
       const foundAuthor = await Author.findOne({ name: args.name });
-      if (!foundAuthor) {
-        author = new Author({ name: args.name, bookCount: 1 });
-        await author.save();
-      } else {
-        foundAuthor.bookCount = foundAuthor.bookCount + 1;
-        await foundAuthor.save();
-        author = foundAuthor;
+      try {
+        if (!foundAuthor) {
+          author = new Author({ name: args.name, bookCount: 1 });
+          await author.save();
+        } else {
+          foundAuthor.bookCount = foundAuthor.bookCount + 1;
+          await foundAuthor.save();
+          author = foundAuthor;
+        }
+        const book = new Book({ ...args, author });
+        return book.save();
+      } catch (error) {
+        throw new GraphQLError("Saving user failed", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.name,
+            error,
+          },
+        });
       }
-      const book = new Book({ ...args, author });
-      return book.save();
     },
     addAuthor: async (root, args) => {
       const author = new Author({ ...args, bookCount: 0 });
-      return author.save();
+      try {
+        return author.save();
+      } catch (error) {
+        throw new GraphQLError("Saving user failed", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.name,
+            error,
+          },
+        });
+      }
     },
     editAuthor: async (root, args) => {
       const author = await Author.findOne({ name: args.name });
