@@ -104,6 +104,9 @@ const resolvers = {
       return books;
     },
     allAuthors: async () => Author.find({}),
+    me: (root, args, context) => {
+      return context.currentUser;
+    },
   },
   Mutation: {
     addBook: async (root, args) => {
