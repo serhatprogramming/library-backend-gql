@@ -110,8 +110,15 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args, context) => {
-      let author = null;
       const currentUser = context.currentUser;
+      if (!currentUser) {
+        throw new GraphQLError("not authenticated", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+          },
+        });
+      }
+      let author = null;
       const foundAuthor = await Author.findOne({ name: args.name });
       try {
         if (!foundAuthor) {
@@ -134,7 +141,15 @@ const resolvers = {
         });
       }
     },
-    addAuthor: async (root, args) => {
+    addAuthor: async (root, args, context) => {
+      const currentUser = context.currentUser;
+      if (!currentUser) {
+        throw new GraphQLError("not authenticated", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+          },
+        });
+      }
       const author = new Author({ ...args, bookCount: 0 });
       try {
         return author.save();
@@ -148,7 +163,15 @@ const resolvers = {
         });
       }
     },
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, context) => {
+      const currentUser = context.currentUser;
+      if (!currentUser) {
+        throw new GraphQLError("not authenticated", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+          },
+        });
+      }
       const author = await Author.findOne({ name: args.name });
       author.born = args.setBornTo;
       return author.save();
