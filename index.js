@@ -109,8 +109,9 @@ const resolvers = {
     },
   },
   Mutation: {
-    addBook: async (root, args) => {
+    addBook: async (root, args, context) => {
       let author = null;
+      const currentUser = context.currentUser;
       const foundAuthor = await Author.findOne({ name: args.name });
       try {
         if (!foundAuthor) {
