@@ -1,3 +1,8 @@
+// import models
+const Author = require("./models/Author");
+const Book = require("./models/Book");
+// jsonwebtoken
+const jwt = require("jsonwebtoken");
 // resolvers
 const resolvers = {
   Query: {

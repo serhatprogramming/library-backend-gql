@@ -1,15 +1,11 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
-// to generate unique ids uuid
-const { v4: uuidv4 } = require("uuid");
 // mongoose import and set
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 // import dotenv and config
 require("dotenv").config();
 // import models
-const Author = require("./models/Author");
-const Book = require("./models/Book");
 const User = require("./models/User");
 // MongoDB database connect
 const MONGODB_URI = process.env.MONGODB_URI;
