@@ -1,8 +1,13 @@
 // import models
 const Author = require("./models/Author");
 const Book = require("./models/Book");
+const User = require("./models/User");
 // jsonwebtoken
 const jwt = require("jsonwebtoken");
+// subscriptions
+const { PubSub } = require("graphql-subscriptions");
+const pubsub = new PubSub();
+
 // resolvers
 const resolvers = {
   Query: {
@@ -23,6 +28,7 @@ const resolvers = {
       return context.currentUser;
     },
   },
+
   Mutation: {
     addBook: async (root, args, context) => {
       const currentUser = context.currentUser;
@@ -45,6 +51,8 @@ const resolvers = {
           author = foundAuthor;
         }
         const book = new Book({ ...args, author });
+        pubsub.publish("BOOK_ADDED", { bookAdded: book });
+        // await book.save();
         return book.save();
       } catch (error) {
         throw new GraphQLError("Saving user failed", {
@@ -56,6 +64,7 @@ const resolvers = {
         });
       }
     },
+
     addAuthor: async (root, args, context) => {
       const currentUser = context.currentUser;
       if (!currentUser) {
@@ -108,6 +117,7 @@ const resolvers = {
       });
     },
     login: async (root, args) => {
+      console.log("I am here...");
       const user = await User.findOne({ username: args.username });
 
       if (!user || args.password !== "secret") {
@@ -124,6 +134,11 @@ const resolvers = {
       };
 
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
+    },
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator("BOOK_ADDED"),
     },
   },
 };

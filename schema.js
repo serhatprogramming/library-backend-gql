@@ -9,6 +9,11 @@ const typeDefs = `
     genres: [String!]!,
   }
 
+
+  type Subscription {
+    bookAdded: Book
+  }
+
   type Author {
     name: String!
     id: ID!
@@ -32,10 +37,6 @@ const typeDefs = `
     allBooks(author:String, genre:String): [Book!]!
     allAuthors: [Author!]!
     me: User
-  }
-
-  type Subscription {
-    bookAdded: Book!
   }
 
   type Mutation {
